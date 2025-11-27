@@ -3,7 +3,7 @@ set -euo pipefail
 
 if [ "$#" -ne 2 ]; then
     echo "Uso: $0 <remote_host> <project_name>"
-    echo "Exemplo: $0 humberto-work cplex_env310"
+    echo "Exemplo: $0 <user>@<host> <project_name>"
     exit 1
 fi
 

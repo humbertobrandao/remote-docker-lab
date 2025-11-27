@@ -149,3 +149,140 @@ Inside create_project.sh:
 - Change container name: edit the naming variable.
 - Change remote folder path: modify the ssh target path.
 
+# Using VSCode with Remote Docker Lab
+
+This section explains how to work with your remote Docker-based project using Visual Studio Code (VSCode).  
+After you create a project using `create_project.sh`, you can use VSCode to edit files directly on the remote server or even inside the Docker container.
+
+---
+
+## Required VSCode Extensions
+
+Install the following extensions on your local machine:
+
+### 1. Remote - SSH  
+**ID:** ms-vscode-remote.remote-ssh  
+Allows VSCode to connect to a remote server over SSH and open folders directly on the server.
+
+### 2. Docker  
+**ID:** ms-azuretools.vscode-docker  
+Adds Docker integration to VSCode, letting you view images, containers, logs, and execute actions.
+
+### 3. Remote - Containers (optional but recommended)  
+**ID:** ms-vscode-remote.remote-containers  
+Allows VSCode to open and develop *inside* a Docker container running on the remote server.
+
+### 4. Recommended language extensions  
+Depending on your tech stack:
+
+- Python: `ms-python.python`
+- Jupyter: `ms-toolsai.jupyter`
+- YAML: `redhat.vscode-yaml`
+- GitLens: `eamodio.gitlens`
+
+---
+
+## Connecting VSCode to the Remote Server
+
+1. Open VSCode.
+2. Press:
+   ```
+   Ctrl + Shift + P
+   ```
+3. Type:
+   ```
+   Remote-SSH: Add New SSH Host
+   ```
+4. Enter the same SSH address used with your scripts:
+   ```
+   user@remote_server_ip
+   ```
+5. VSCode will store this configuration in your SSH config file.
+6. Now, again press:
+   ```
+   Ctrl + Shift + P
+   ```
+7. Select:
+   ```
+   Remote-SSH: Connect to Host
+   ```
+8. Choose your server from the list.
+
+VSCode will open a remote window connected directly to your server.
+
+---
+
+## Opening the Remote Project Folder
+
+Once connected to the server:
+
+1. Click **File > Open Folder**
+2. Select the project directory created by the script, for example:
+   ```
+   /home/user/project_name
+   ```
+3. Click **OK**.
+
+VSCode now edits files directly on the remote server.
+
+---
+
+## Using the Remote Terminal
+
+Inside VSCode:
+
+1. Press:
+   ```
+   Ctrl + `
+   ```
+2. A terminal will open **on the remote server**, inside your project directory.
+
+You can run commands like:
+```
+docker build -t myproject .
+docker run --rm -it -v /home/user/myproject:/workspace myproject
+```
+
+---
+
+## Developing Inside the Docker Container (Optional)
+
+If you installed the **Remote - Containers** extension, you can open VSCode *inside the running container*.
+
+Steps:
+
+1. Start the container on the remote server:
+   ```
+   docker run -d -v /home/user/projectX:/workspace --name projectX projectX
+   ```
+2. In VSCode, press:
+   ```
+   Ctrl + Shift + P
+   ```
+3. Select:
+   ```
+   Remote-Containers: Attach to Running Container...
+   ```
+4. Choose your container (ex: `projectX`).
+
+VSCode will restart in a new window, now running **inside the container environment**.
+
+This allows:
+
+- Editing files within the mounted folder
+- Using Python/R/Java inside the container
+- Running terminal commands inside the container
+- Full isolation from both your local and remote host systems
+
+---
+
+## Summary of VSCode Workflow
+
+1. Create project using `create_project.sh`.
+2. Open VSCode → Remote-SSH → Connect to server.
+3. Open the remote folder `/home/user/project_name`.
+4. Use the terminal inside VSCode to run Docker commands.
+5. (Optional) Attach VSCode directly to the running container.
+
+This setup provides a complete cloud-based development workflow, with no need for local CPU/RAM usage.
+

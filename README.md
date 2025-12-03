@@ -109,6 +109,60 @@ Run the container:
 docker run --rm -it -v /home/user/experiment_alpha:/workspace experiment_alpha
 ```
 
+## Create a New Remote Project With GitHub Integration (Optional)
+
+The script `create_project.sh` also supports automatically creating a **private GitHub repository**, initializing Git inside the remote project folder, and performing the first commit and push.
+
+This mode is optional and only activates when you provide **four arguments** instead of two.
+
+### Syntax
+
+```
+./create_project.sh <remote_user>@<remote_host> <project_name> <github_user> <github_repo_name>
+```
+
+### Example
+
+```
+./create_project.sh user@192.168.1.20 projectX mygithubuser projectX
+```
+
+### What happens in this mode?
+
+When the optional GitHub parameters are provided, the script will:
+
+1. Create the project normally on the remote machine.
+2. Prompt you for your **GitHub Personal Access Token**.
+3. Create a **private GitHub repository** named `<github_repo_name>`.
+4. Initialize a Git repository inside the remote project folder.
+5. Add all files and create the first commit.
+6. Push the commit to GitHub on the `main` branch.
+
+### Requirements for GitHub Mode
+
+- A GitHub Personal Access Token with **repo** permission.
+- The target repository must **not already exist**.
+- Git must be available on the remote server.
+
+### Example Workflow
+
+```
+./create_project.sh user@server projectX mygithubuser projectX
+# Script prompts for GitHub token
+# Remote project is created
+# Private GitHub repository is created
+# First commit and push are performed automatically
+```
+
+### Switching Remote URL to SSH (Recommended)
+
+```
+cd ~/projects/projectX
+git remote set-url origin git@github.com:mygithubuser/projectX.git
+```
+
+---
+
 ## Remove a Remote Project
 
 Syntax:
@@ -149,6 +203,8 @@ Inside create_project.sh:
 - Change container name: edit the naming variable.
 - Change remote folder path: modify the ssh target path.
 
+---
+
 # Using VSCode with Remote Docker Lab
 
 This section explains how to work with your remote Docker-based project using Visual Studio Code (VSCode).  
@@ -162,68 +218,41 @@ Install the following extensions on your local machine:
 
 ### 1. Remote - SSH  
 **ID:** ms-vscode-remote.remote-ssh  
-Allows VSCode to connect to a remote server over SSH and open folders directly on the server.
 
 ### 2. Docker  
 **ID:** ms-azuretools.vscode-docker  
-Adds Docker integration to VSCode, letting you view images, containers, logs, and execute actions.
 
 ### 3. Remote - Containers (optional but recommended)  
 **ID:** ms-vscode-remote.remote-containers  
-Allows VSCode to open and develop *inside* a Docker container running on the remote server.
 
-### 4. Recommended language extensions  
-Depending on your tech stack:
-
-- Python: `ms-python.python`
-- Jupyter: `ms-toolsai.jupyter`
-- YAML: `redhat.vscode-yaml`
-- GitLens: `eamodio.gitlens`
+### 4. Recommended language extensions
+- Python: ms-python.python
+- Jupyter: ms-toolsai.jupyter
+- YAML: redhat.vscode-yaml
+- GitLens: eamodio.gitlens
 
 ---
 
 ## Connecting VSCode to the Remote Server
 
 1. Open VSCode.
-2. Press:
-   ```
-   Ctrl + Shift + P
-   ```
-3. Type:
-   ```
-   Remote-SSH: Add New SSH Host
-   ```
-4. Enter the same SSH address used with your scripts:
-   ```
-   user@remote_server_ip
-   ```
-5. VSCode will store this configuration in your SSH config file.
-6. Now, again press:
-   ```
-   Ctrl + Shift + P
-   ```
-7. Select:
-   ```
-   Remote-SSH: Connect to Host
-   ```
-8. Choose your server from the list.
-
-VSCode will open a remote window connected directly to your server.
+2. Press: `Ctrl + Shift + P`
+3. Run: **Remote-SSH: Add New SSH Host**
+4. Enter: `user@remote_server_ip`
+5. Again press: `Ctrl + Shift + P`
+6. Select: **Remote-SSH: Connect to Host**
+7. Choose your server.
 
 ---
 
 ## Opening the Remote Project Folder
 
-Once connected to the server:
+1. Go to **File > Open Folder**
+2. Select:
 
-1. Click **File > Open Folder**
-2. Select the project directory created by the script, for example:
-   ```
-   /home/user/project_name
-   ```
-3. Click **OK**.
-
-VSCode now edits files directly on the remote server.
+```
+/home/user/project_name
+```
 
 ---
 
@@ -231,13 +260,14 @@ VSCode now edits files directly on the remote server.
 
 Inside VSCode:
 
-1. Press:
-   ```
-   Ctrl + `
-   ```
-2. A terminal will open **on the remote server**, inside your project directory.
+Press:
 
-You can run commands like:
+```
+Ctrl + `
+```
+
+Run commands normally:
+
 ```
 docker build -t myproject .
 docker run --rm -it -v /home/user/myproject:/workspace myproject
@@ -247,42 +277,25 @@ docker run --rm -it -v /home/user/myproject:/workspace myproject
 
 ## Developing Inside the Docker Container (Optional)
 
-If you installed the **Remote - Containers** extension, you can open VSCode *inside the running container*.
+1. Start container:
 
-Steps:
+```
+docker run -d -v /home/user/projectX:/workspace --name projectX projectX
+```
 
-1. Start the container on the remote server:
-   ```
-   docker run -d -v /home/user/projectX:/workspace --name projectX projectX
-   ```
-2. In VSCode, press:
-   ```
-   Ctrl + Shift + P
-   ```
-3. Select:
-   ```
-   Remote-Containers: Attach to Running Container...
-   ```
-4. Choose your container (ex: `projectX`).
+2. In VSCode:
 
-VSCode will restart in a new window, now running **inside the container environment**.
-
-This allows:
-
-- Editing files within the mounted folder
-- Using Python/R/Java inside the container
-- Running terminal commands inside the container
-- Full isolation from both your local and remote host systems
+```
+Ctrl + Shift + P
+Remote-Containers: Attach to Running Container...
+```
 
 ---
 
 ## Summary of VSCode Workflow
 
-1. Create project using `create_project.sh`.
-2. Open VSCode → Remote-SSH → Connect to server.
-3. Open the remote folder `/home/user/project_name`.
-4. Use the terminal inside VSCode to run Docker commands.
-5. (Optional) Attach VSCode directly to the running container.
-
-This setup provides a complete cloud-based development workflow, with no need for local CPU/RAM usage.
-
+1. Create project using create_project.sh  
+2. Connect via Remote-SSH  
+3. Open project folder  
+4. Use terminal inside VSCode  
+5. Optionally attach to container  
